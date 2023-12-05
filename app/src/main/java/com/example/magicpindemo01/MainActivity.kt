@@ -70,7 +70,7 @@ class MainActivity : ComponentActivity() {
                     val newMovies = response.body()!!.results
                     Log.e("size", " size of updated ${newMovies.size} and page = ${page}")
                     myAdapter.addItems(newMovies as MutableList<MovieResult>)
-                    canLoad=true
+                    canLoad = true
 
                 } else {
 
