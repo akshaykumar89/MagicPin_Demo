@@ -56,7 +56,7 @@ class ParentAdapter(val moviesList: MutableList<MovieResult>) :
             holder.movieDiscription.text = currentItem.overview
             Glide
                 .with(holder.itemView.context)
-                .load(Constants.MoviePosterPrefix + currentItem.poster_path)
+                .load(Constants.MOVIE_POSTER_PREFIX + currentItem.poster_path)
                 .error(R.drawable.error_image)
                 .into(holder.moviePoster)
         }

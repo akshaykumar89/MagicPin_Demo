@@ -16,7 +16,7 @@ import retrofit2.Response
 class MainActivity : ComponentActivity() {
 
     private lateinit var parentRecyclerView: RecyclerView
-    private var canLoad = true
+    private var canLoad = true  // Will act as a token for Scroll Listener to load next page data
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,44 +49,35 @@ class MainActivity : ComponentActivity() {
                     page++
                     Toast.makeText(this@MainActivity, "Reaching end", Toast.LENGTH_SHORT).show()
                     fillData(page, myAdapter)
-
-
                 }
             }
-
         })
-
     }
 
     private fun fillData(page: Int, myAdapter: ParentAdapter) {
 
-
         val call = TmdbRetrofitObject.apiService.GetMovieList(Constants.API_KEY, page)
-
 
         call.enqueue(object : Callback<MovieItems> {
             override fun onResponse(call: Call<MovieItems>, response: Response<MovieItems>) {
-                if (response.isSuccessful) {
-                    val newMovies = response.body()!!.results
-                    Log.e("size", " size of updated ${newMovies.size} and page = ${page}")
-                    myAdapter.addItems(newMovies as MutableList<MovieResult>)
-                    canLoad = true
-
-                } else {
-
-                    Log.e("API", "Error: ${response.code()}")
+                when {
+                    response.isSuccessful -> {
+                        val newMovies = response.body()!!.results
+                        Log.e("size", " size of updated ${newMovies.size} and page = ${page}")
+                        myAdapter.addItems(newMovies as MutableList<MovieResult>)
+                        canLoad = true
+                    }
+                    else -> {
+                        Log.e("API", "Error: ${response.code()}")
+                    }
                 }
             }
 
             override fun onFailure(call: Call<MovieItems>, t: Throwable) {
-
                 Log.e("API", "Network error: ${t.message}")
             }
         })
-
     }
-
-
 }
 
 
