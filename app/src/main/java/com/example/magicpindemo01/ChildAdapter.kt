@@ -1,42 +1,44 @@
 package com.example.magicpindemo01
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.bumptech.glide.Glide
+import com.example.magicpindemo01.databinding.HorizontalCardViewBinding
 import com.example.magicpindemo01.model.MovieResult
 
 class ChildAdapter(private val movieList: List<MovieResult>) :
-    RecyclerView.Adapter<ChildAdapter.ChildViewHolder>() {
+    RecyclerView.Adapter<ViewHolder>() {
 
-    inner class ChildViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val movieTitle = itemView.findViewById<TextView>(R.id.MovieName_Hrz_TextView)
+    private lateinit var childCardBinding: HorizontalCardViewBinding
 
-        val moviePoster = itemView.findViewById<ImageView>(R.id.MoviePoster_hrz_ImageView)
+    inner class ChildViewHolder(binding: HorizontalCardViewBinding) : ViewHolder(binding.root) {
+        val movieTitle = binding.MovieNameHrzTextView
+        val moviePoster = binding.MoviePosterHrzImageView
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ChildViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.horizontal_card_view, parent, false)
-        return ChildViewHolder(view)
+        val inflater = LayoutInflater.from(parent.context)
+        childCardBinding = HorizontalCardViewBinding.inflate(inflater, parent, false)
+        return ChildViewHolder(childCardBinding)
     }
 
     override fun getItemCount(): Int {
         return movieList.size
     }
 
-    override fun onBindViewHolder(holder: ChildViewHolder, position: Int) {
-        val currentItem = movieList[position]
-        holder.movieTitle.text = currentItem.title
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        if (holder is ChildViewHolder) {
 
-        Glide
-            .with(holder.itemView.context)
-            .load(Constants.MOVIE_POSTER_PREFIX + currentItem.poster_path)
-            .error(R.drawable.error_image)
-            .into(holder.moviePoster)
+            val currentItem = movieList[position]
+            holder.movieTitle.text = currentItem.title
 
+            Glide
+                .with(holder.itemView.context)
+                .load(Constants.MOVIE_POSTER_PREFIX + currentItem.poster_path)
+                .error(R.drawable.error_image)
+                .into(holder.moviePoster)
+        }
     }
 }

@@ -2,45 +2,57 @@ package com.example.magicpindemo01
 
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.magicpindemo01.databinding.HorizontalRecyclerviewChildBinding
+import com.example.magicpindemo01.databinding.VerticalMovieCardViewBinding
 import com.example.magicpindemo01.model.MovieResult
 
 
-class ParentAdapter(val moviesList: MutableList<MovieResult>) :
-    RecyclerView.Adapter<ParentAdapter.ParentViewHolder>() {
 
-    inner class ParentViewHolder(itemview: View) : RecyclerView.ViewHolder(itemview) {
-        val movieTitle = itemview.findViewById<TextView>(R.id.movieTitleTextView)
-        val movieDiscription = itemview.findViewById<TextView>(R.id.movieDescriptionTextView)
-        val moviePoster = itemview.findViewById<ImageView>(R.id.movieImageView)
-        val childRecyclerView = itemView.findViewById<RecyclerView>(R.id.childRecyclerViewWidget)
+class ParentAdapter(private val moviesList: MutableList<MovieResult>) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    private lateinit var parentBinding: VerticalMovieCardViewBinding
+    private lateinit var childRecyclerViewBinding: HorizontalRecyclerviewChildBinding
+
+    inner class ParentViewHolder(binding: VerticalMovieCardViewBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        val movieTitle = binding.movieTitleTextView
+        val movieDescription = binding.movieDescriptionTextView
+        val moviePoster = binding.movieImageView
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ParentViewHolder {
+    inner class HorizontalRecyclerViewHolder(binding: HorizontalRecyclerviewChildBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        val childRecyclerView = binding.childRecyclerViewWidget
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        return when (viewType) {
+
+       return when (viewType) {
             0 -> {
-                val view = inflater.inflate(R.layout.horizontal_recyclerview_child, parent, false)
-                ParentViewHolder(view)
+                childRecyclerViewBinding = HorizontalRecyclerviewChildBinding.inflate(
+                    inflater, parent, false
+                )
+                HorizontalRecyclerViewHolder(childRecyclerViewBinding)
             }
 
             else -> {
-                val view = inflater.inflate(R.layout.vertical_movie_card_view, parent, false)
-                ParentViewHolder(view)
+                parentBinding = VerticalMovieCardViewBinding.inflate(
+                    inflater, parent, false
+                )
+                ParentViewHolder(parentBinding)
             }
         }
-
     }
 
-    override fun onBindViewHolder(holder: ParentViewHolder, position: Int) {
-        if (position == 0) {
-            if (holder.childRecyclerView != null) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (holder) {
+            is HorizontalRecyclerViewHolder -> {
                 val childLayoutManager = LinearLayoutManager(
                     holder.itemView.context,
                     LinearLayoutManager.HORIZONTAL,
@@ -50,15 +62,17 @@ class ParentAdapter(val moviesList: MutableList<MovieResult>) :
                 val childAdapter = ChildAdapter(moviesList)
                 holder.childRecyclerView.adapter = childAdapter
             }
-        } else {
-            val currentItem = moviesList[position]
-            holder.movieTitle.text = currentItem.title
-            holder.movieDiscription.text = currentItem.overview
-            Glide
-                .with(holder.itemView.context)
-                .load(Constants.MOVIE_POSTER_PREFIX + currentItem.poster_path)
-                .error(R.drawable.error_image)
-                .into(holder.moviePoster)
+
+            is ParentViewHolder -> {
+                val currentItem = moviesList[position]
+                holder.movieTitle.text = currentItem.title
+                holder.movieDescription.text = currentItem.overview
+                Glide
+                    .with(holder.itemView.context)
+                    .load(Constants.MOVIE_POSTER_PREFIX + currentItem.poster_path)
+                    .error(R.drawable.error_image)
+                    .into(holder.moviePoster)
+            }
         }
     }
 
@@ -68,7 +82,7 @@ class ParentAdapter(val moviesList: MutableList<MovieResult>) :
         }
 
         val currentSize = this.moviesList.size
-        Log.e("size","size of mutable list = ${currentSize}")
+        Log.e("size", "size of mutable list = $currentSize")
         this.moviesList.addAll(moviesList)
         notifyItemRangeChanged(currentSize, this.moviesList.size - currentSize)
     }
