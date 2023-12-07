@@ -19,7 +19,9 @@ android {
             useSupportLibrary = true
         }
     }
-
+   viewBinding {
+       enable = true
+   }
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -74,7 +76,8 @@ dependencies {
     implementation ("androidx.cardview:cardview:1.0.0")
     // GLide
     implementation ("com.github.bumptech.glide:glide:4.16.0")
-
+   // viewBinding
+    implementation ("com.android.databinding:viewbinding:8.2.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
